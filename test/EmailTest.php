@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 class EmailTest extends TestCase
 {
     const SUBJECT = 'good bye party Jafare';
+    const MESSAGE = 'email body';
 
     /**
     * @test
@@ -24,7 +25,16 @@ class EmailTest extends TestCase
     */
     public function email_subject()
     {
-        $email = new Email(self::SUBJECT);
+        $email = new Email(self::SUBJECT, '');
         $this->assertSame(self::SUBJECT, $email->subject);
+    }
+
+    /**
+    * @test
+    */
+    public function email_message()
+    {
+        $email = new Email(self::SUBJECT, self::MESSAGE);
+        $this->assertSame(self::MESSAGE, $email->message);
     }
 }
