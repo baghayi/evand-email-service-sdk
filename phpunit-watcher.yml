@@ -1,3 +1,7 @@
 phpunit:
   binaryPath: vendor/bin/phpunit
   arguments: '--colors'
+watch:
+  directories:
+    - src
+    - test
