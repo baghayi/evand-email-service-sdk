@@ -1,0 +1,14 @@
+{
+    "name": "evandhq/evand-email-service-sdk",
+    "description": "evand mail spammer SDK",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hüsen Baghayi",
+            "email": "hossein.baghayi@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
