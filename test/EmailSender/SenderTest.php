@@ -23,6 +23,7 @@ class SenderTest extends TestCase
     const MSG = 'Husen\'s last days in evand.';
     const RESOURCE_URI = 'https://kaftar.evand.com/api/send-email';
     const TAG = 'pofak';
+    const ACCESS_TOKEN = 'some_strong_random_string';
 
     /**
     * @test
@@ -39,7 +40,7 @@ class SenderTest extends TestCase
     {
         $container = [];
         $client = $this->configureGuzzle($container);
-        $sender = new Sender($client);
+        $sender = new Sender($client, '');
         $sender->send(new Email(self::SUBJECT, self::MSG, new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), self::RECIPIENT_NAME)));
 
         $this->assertNotEmpty($container);
@@ -60,10 +61,24 @@ class SenderTest extends TestCase
     {
         $container = [];
         $client = $this->configureGuzzle($container);
-        $sender = new Sender($client);
+        $sender = new Sender($client, '');
         $sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), ''), self::TAG));
         $request_body = $this->getRequestBody($container);
         $this->assertSame(self::TAG, $request_body->tag);
+    }
+
+    /**
+    * @test
+    */
+    public function authenticates()
+    {
+        $container = [];
+        $client = $this->configureGuzzle($container);
+        $sender = new Sender($client, self::ACCESS_TOKEN);
+        $sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), '')));
+        $headers = $container[0]['request']->getHeaders();
+        $this->assertArrayHasKey('Authorization', $headers);
+        $this->assertSame(sprintf('Handmade %s', self::ACCESS_TOKEN), $headers['Authorization'][0]);
     }
 
     private function configureGuzzle(array &$container): Client

@@ -12,10 +12,12 @@ class Sender
     const RESOURCE_URI = 'https://kaftar.evand.com/api/send-email';
 
     private $http;
+    private $accessToken;
 
-    public function __construct(Client $http)
+    public function __construct(Client $http, string $accessToken)
     {
         $this->http = $http;
+        $this->accessToken = $accessToken;
     }
 
     public function send(Email $email)
@@ -29,6 +31,9 @@ class Sender
                     'email' => (string) $email->recipient->email,
                 ],
                 'tag' => $email->tag,
+            ],
+            'headers' => [
+                'Authorization' => sprintf('Handmade %s', $this->accessToken),
             ]
         ]);
     }
