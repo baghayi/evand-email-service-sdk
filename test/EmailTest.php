@@ -56,4 +56,14 @@ class EmailTest extends TestCase
         $email = new Email('', '', $recipient);
         $this->assertSame($recipient, $email->recipient);
     }
+
+    /**
+    * @test
+    */
+    public function could_optionaly_tag_an_email()
+    {
+        $recipient = new Recipient(new EmailAddress(self::EMAIL), 'husen');
+        $email = new Email('', '', $recipient, 'my_tag');
+        $this->assertSame('my_tag', $email->tag);
+    }
 }

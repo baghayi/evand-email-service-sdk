@@ -22,6 +22,7 @@ class SenderTest extends TestCase
     const SUBJECT = 'f**k bye';
     const MSG = 'Husen\'s last days in evand.';
     const RESOURCE_URI = 'https://kaftar.evand.com/api/send-email';
+    const TAG = 'pofak';
 
     /**
     * @test
@@ -44,12 +45,25 @@ class SenderTest extends TestCase
         $this->assertNotEmpty($container);
         $this->assertSame('POST', $container[0]['request']->getMethod());
         $this->assertSame(self::RESOURCE_URI, (string) $container[0]['request']->getUri());
-        $request_body = json_decode((string) $container[0]['request']->getBody());
+        $request_body = $this->getRequestBody($container);
         $this->assertNotEmpty($request_body);
         $this->assertSame(self::SUBJECT, $request_body->subject);
         $this->assertSame(self::MSG, $request_body->message);
         $this->assertSame(self::RECIPIENT_NAME, $request_body->recipient->name);
         $this->assertSame(self::RECIPIENT_EMAIL, $request_body->recipient->email);
+    }
+
+    /**
+    * @test
+    */
+    public function could_tag_an_email()
+    {
+        $container = [];
+        $client = $this->configureGuzzle($container);
+        $sender = new Sender($client);
+        $sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), ''), self::TAG));
+        $request_body = $this->getRequestBody($container);
+        $this->assertSame(self::TAG, $request_body->tag);
     }
 
     private function configureGuzzle(array &$container): Client
@@ -60,5 +74,11 @@ class SenderTest extends TestCase
         $handlerStack->push($history);
         $client = new Client(['handler' => $handlerStack]);
         return $client;
+    }
+
+    private function getRequestBody(array $container)
+    {
+        $request_body = json_decode((string) $container[0]['request']->getBody());
+        return $request_body;
     }
 }

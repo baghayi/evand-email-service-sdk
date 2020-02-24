@@ -28,6 +28,7 @@ class Sender
                     'name' => $email->recipient->name,
                     'email' => (string) $email->recipient->email,
                 ],
+                'tag' => $email->tag,
             ]
         ]);
     }
