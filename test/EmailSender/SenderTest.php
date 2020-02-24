@@ -54,11 +54,9 @@ class SenderTest extends TestCase
     {
         $this->sender->send(new Email(self::SUBJECT, self::MSG, new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), self::RECIPIENT_NAME)));
 
-        $this->assertNotEmpty($this->container);
         $this->assertSame('POST', $this->container[0]['request']->getMethod());
         $this->assertSame(self::RESOURCE_URI, (string) $this->container[0]['request']->getUri());
         $request_body = $this->getRequestBody($this->container);
-        $this->assertNotEmpty($request_body);
         $this->assertSame(self::SUBJECT, $request_body->subject);
         $this->assertSame(self::MSG, $request_body->message);
         $this->assertSame(self::RECIPIENT_NAME, $request_body->recipient->name);
