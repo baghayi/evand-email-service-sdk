@@ -25,6 +25,20 @@ class SenderTest extends TestCase
     const TAG = 'pofak';
     const ACCESS_TOKEN = 'some_strong_random_string';
 
+    private $sender;
+    private $container = [];
+
+    public function setUp(): void
+    {
+        $client = $this->configureGuzzle($this->container);
+        $this->sender = new Sender($client, self::ACCESS_TOKEN);
+    }
+
+    public function tearDown(): void
+    {
+        $this->container = [];
+    }
+
     /**
     * @test
     */
@@ -38,15 +52,12 @@ class SenderTest extends TestCase
     */
     public function send_an_email()
     {
-        $container = [];
-        $client = $this->configureGuzzle($container);
-        $sender = new Sender($client, '');
-        $sender->send(new Email(self::SUBJECT, self::MSG, new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), self::RECIPIENT_NAME)));
+        $this->sender->send(new Email(self::SUBJECT, self::MSG, new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), self::RECIPIENT_NAME)));
 
-        $this->assertNotEmpty($container);
-        $this->assertSame('POST', $container[0]['request']->getMethod());
-        $this->assertSame(self::RESOURCE_URI, (string) $container[0]['request']->getUri());
-        $request_body = $this->getRequestBody($container);
+        $this->assertNotEmpty($this->container);
+        $this->assertSame('POST', $this->container[0]['request']->getMethod());
+        $this->assertSame(self::RESOURCE_URI, (string) $this->container[0]['request']->getUri());
+        $request_body = $this->getRequestBody($this->container);
         $this->assertNotEmpty($request_body);
         $this->assertSame(self::SUBJECT, $request_body->subject);
         $this->assertSame(self::MSG, $request_body->message);
@@ -59,11 +70,8 @@ class SenderTest extends TestCase
     */
     public function could_tag_an_email()
     {
-        $container = [];
-        $client = $this->configureGuzzle($container);
-        $sender = new Sender($client, '');
-        $sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), ''), self::TAG));
-        $request_body = $this->getRequestBody($container);
+        $this->sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), ''), self::TAG));
+        $request_body = $this->getRequestBody($this->container);
         $this->assertSame(self::TAG, $request_body->tag);
     }
 
@@ -72,11 +80,8 @@ class SenderTest extends TestCase
     */
     public function authenticates()
     {
-        $container = [];
-        $client = $this->configureGuzzle($container);
-        $sender = new Sender($client, self::ACCESS_TOKEN);
-        $sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), '')));
-        $headers = $container[0]['request']->getHeaders();
+        $this->sender->send(new Email('', '', new Recipient(new EmailAddress(self::RECIPIENT_EMAIL), '')));
+        $headers = $this->container[0]['request']->getHeaders();
         $this->assertArrayHasKey('Authorization', $headers);
         $this->assertSame(sprintf('Handmade %s', self::ACCESS_TOKEN), $headers['Authorization'][0]);
     }
